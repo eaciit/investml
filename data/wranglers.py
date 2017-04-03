@@ -4,6 +4,7 @@ import os
 import glob
 import csv
 import pandas as pd
+from sklearn.preprocessing import normalize
 
 path = "ALL_TIME"
 csv_path = glob.glob(path + "/*.csv")
@@ -62,6 +63,10 @@ for d in ds:
 
 data = data[:i]
 print data.shape
+
+data_s = data[:, :-1]
+data_s = normalize(data_s, axis=0)
+data = np.concatenate((data_s, data[:, -1:]), axis=1)
 
 np.savetxt("generated/" + path + ".csv", data, delimiter=",")
 np.save("generated/" + path + ".npy", data)
