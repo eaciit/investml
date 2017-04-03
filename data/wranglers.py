@@ -1,10 +1,11 @@
 import numpy as np
+import datetime
 import os
 import glob
 import csv
 import pandas as pd
 
-path = "1Y"
+path = "ALL_TIME"
 csv_path = glob.glob(path + "/*.csv")
 
 ds = []
@@ -34,19 +35,25 @@ data = np.zeros((count, 6*2+1))
 i, k = 0, 0
 for d in ds:
     j = 0
-    offset = 0
+    coff = 0
     for ed in d:
         if j == 0:
             j += 1
             continue
 
-        if dates[k][j][0] != composite_dates[j-offset][0]:
+        d1 = datetime.datetime.strptime(dates[k][j][0], "%Y-%m-%d")
+        d2 = datetime.datetime.strptime(composite_dates[j-coff][0], "%Y-%m-%d")
+        if d2 > d1:
             j += 1
-            offset += 1
+            coff -= 1
+            continue
+        elif d1 > d2:
+            j += 1
+            coff += 1
             continue
 
         data[i, 0:6] = ed
-        data[i, 6:12] = composite[j-offset]
+        data[i, 6:12] = composite[j-coff]
         data[i, 12] = d[j-1][5]
         j += 1
         i += 1
@@ -56,5 +63,5 @@ for d in ds:
 data = data[:i]
 print data.shape
 
-np.savetxt(path + "/Data.csv", data, delimiter=",")
-np.save(path + "/Data.npy", data)
+np.savetxt("generated/" + path + ".csv", data, delimiter=",")
+np.save("generated/" + path + ".npy", data)
